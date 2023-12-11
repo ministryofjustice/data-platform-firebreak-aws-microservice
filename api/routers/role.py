@@ -6,7 +6,6 @@ from pydantic import BaseModel
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
-
 class Role(BaseModel):
     name: str
     permissions: Optional[list[str]] = None
@@ -20,16 +19,6 @@ michael = Role(name='Michael', permissions=["write"], username="michael")
 mitch = Role(name='Mitch', permissions=["read"], username="mitch")
 
 roles = [michael, mitch]
-# roles = {
-#     "michael": {
-#         "name": "michael",
-#         "permissions":["write"]
-#     },
-#     "mitch": {
-#         "name": "mitch",
-#         "permissions":["read"]
-#     }
-# }
 
 
 @router.get("/", response_model=list[RoleResponse])
