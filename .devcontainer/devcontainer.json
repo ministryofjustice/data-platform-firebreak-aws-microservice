@@ -1,0 +1,23 @@
+{
+  "name": "data-platform-aws-microservice",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "./features/src/postgresql": {}
+  },
+  "postCreateCommand": "bash .devcontainer/scripts/post_create.sh",
+  "postStartCommand": "bash .devcontainer/scripts/post_start.sh",
+  "runArgs": ["--name=data-platform-aws-microservice-devcontainer"],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "GitHub.vscode-github-actions",
+        "GitHub.vscode-codeql"
+      ]
+    }
+  }
+}
