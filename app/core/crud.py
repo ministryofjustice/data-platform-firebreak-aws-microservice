@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from core import models, schemas
+from app.core import models, schemas
 
 
 def get_roles(db: Session):

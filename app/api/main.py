@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from api.routers import role
-from core import databases, models
+from app.api.routers import role
+from app.core import databases, models
 
 models.Base.metadata.create_all(bind=databases.engine)
 

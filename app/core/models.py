@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from core.databases import Base
+from app.core.databases import Base
 
 
 class Permission(Base):
