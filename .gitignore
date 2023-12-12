@@ -10,3 +10,4 @@ env/
 terraform.tfstate
 .idea/
 __pycache__/
+sql_app.db

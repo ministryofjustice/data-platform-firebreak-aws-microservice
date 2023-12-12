@@ -24,8 +24,7 @@ class RoleBase(BaseModel):
 class RoleCreate(RoleBase):
     pass
 
-
-class Role(RoleBase):
+class RoleRead(RoleBase):
     id: int
 
     class Config:
