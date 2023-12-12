@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 
-from core import schemas, models
+from core import models, schemas
 
 
 def get_roles(db: Session):
     return db.query(models.Role).all()
+
 
 def get_role(db: Session, role_username: str):
     return db.query(models.Role).filter(models.Role.username == role_username).first()
