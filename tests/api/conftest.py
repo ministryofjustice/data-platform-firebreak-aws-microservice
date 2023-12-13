@@ -3,8 +3,8 @@ import pytest
 from moto import mock_iam
 
 
-@pytest.fixture
-def iam_client(autouse=True):
+@pytest.fixture(autouse=True)
+def iam_client():
     with mock_iam():
         iam = boto3.client("iam")
         yield iam

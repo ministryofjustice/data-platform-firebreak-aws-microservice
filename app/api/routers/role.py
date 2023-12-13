@@ -9,7 +9,7 @@ router = APIRouter(prefix="/roles", tags=["roles"])
 
 
 def iam_client():
-    # TODO mock this in local dev?
+    # TODO mock this in local dev? Try localstack?
     return boto3.client("iam")
 
 
