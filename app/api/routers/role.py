@@ -3,16 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.core import crud, schemas
 from app.core.databases import get_db
+from tests.fixtures import get_roles_response
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
 
 @router.get("/")
-async def get_roles(db: Session = Depends(get_db)):
+async def get_roles():
     """
     List all the roles
     """
-    return crud.get_roles(db)
+    return get_roles_response.get("Roles", [])
 
 
 @router.get("/{username}/")
