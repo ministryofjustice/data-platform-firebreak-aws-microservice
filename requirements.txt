@@ -4,5 +4,7 @@ httpx==0.25.2
 moto[iam]==4.2.11
 pytest==7.4.3
 pytest-env==1.1.3
+pytest-env==1.1.3
+python-dotenv==1.0.0
 sqlalchemy==2.0.23
 uvicorn==0.24.0.post1
