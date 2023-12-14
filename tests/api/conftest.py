@@ -12,5 +12,4 @@ def iam_client():
 
 @pytest.fixture
 def iam_role(iam_client):
-    iam = boto3.client("iam")
-    return iam.create_role(RoleName="example-role", AssumeRolePolicyDocument="example")
+    return iam_client.create_role(RoleName="example-role", AssumeRolePolicyDocument="example")
