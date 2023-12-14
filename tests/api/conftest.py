@@ -1,31 +1,15 @@
-from datetime import datetime
-
+import boto3
 import pytest
+from moto import mock_iam
+
+
+@pytest.fixture(autouse=True)
+def iam_client():
+    with mock_iam():
+        iam = boto3.client("iam")
+        yield iam
 
 
 @pytest.fixture
-def get_role_response():
-    return {
-        "Roles": [
-            {
-                "Path": "string",
-                "RoleName": "string",
-                "RoleId": "string",
-                "Arn": "string",
-                "CreateDate": datetime(2015, 1, 1),
-                "AssumeRolePolicyDocument": "string",
-                "Description": "string",
-                "MaxSessionDuration": 123,
-                "PermissionsBoundary": {
-                    "PermissionsBoundaryType": "PermissionsBoundaryPolicy",
-                    "PermissionsBoundaryArn": "string",
-                },
-                "Tags": [
-                    {"Key": "string", "Value": "string"},
-                ],
-                "RoleLastUsed": {"LastUsedDate": datetime(2015, 1, 1), "Region": "string"},
-            },
-        ],
-        "IsTruncated": True | False,
-        "Marker": "string",
-    }
+def iam_role(iam_client):
+    return iam_client.create_role(RoleName="example-role", AssumeRolePolicyDocument="example")

@@ -1,11 +1,16 @@
+import boto3
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core import crud, schemas
 from app.core.databases import get_db
-from tests.fixtures import get_roles_response
 
 router = APIRouter(prefix="/roles", tags=["roles"])
+
+
+def iam_client():
+    # TODO mock this in local dev? Try localstack?
+    return boto3.client("iam")
 
 
 @router.get("/")
@@ -13,7 +18,10 @@ async def get_roles():
     """
     List all the roles
     """
-    return get_roles_response.get("Roles", [])
+    response = iam_client().list_roles()
+    if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+        return HTTPException(400)
+    return response.get("Roles", [])
 
 
 @router.get("/{username}/")
