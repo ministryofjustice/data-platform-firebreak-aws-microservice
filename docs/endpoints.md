@@ -1,7 +1,7 @@
 # ROLES
 
 GET
-/roles/
+`/roles/`
 - list roles read from AWS
 - paginated (fastapi, boto3)
 - return response from boto3
@@ -9,20 +9,20 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/c
 - convert response data e.g. camelcase to underscore_
     - ReturnResponse models
 
-/roles/<rolename>/
+`/roles/<rolename>/`
 - detail of role
 - include https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/list_role_policies.html
 
-/roles/<rolename>/policies/
+`/roles/<rolename>/policies/`
 - list all policy documents
 - response size limit??
 
 OR list policy names and then
-/roles/<rolename>/policies/<policyname>
+`/roles/<rolename>/policies/<policyname>/`
 - policy documents
 
 POST create
-/roles/
+`/roles/`
 Expected data:
 - rolename - required - up to the client to define
     - validate role does not already exist
@@ -39,7 +39,7 @@ Notes:
 https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/create_role.html
 
 POST
-/roles/<rolename>/datasource/
+`/roles/<rolename>/datasource/`
 - Grant access to a s3bucket/folder
 - Creates or updates the s3 policy
 Data:
@@ -52,7 +52,7 @@ Response:
 - error message (if applicable)
 
 DELETE
-/roles/<rolename>/
+`/roles/<rolename>/`
 - Delete the role
 
 TBC

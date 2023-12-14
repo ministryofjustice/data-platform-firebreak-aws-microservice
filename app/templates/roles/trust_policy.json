@@ -1,0 +1,8 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {% include 'roles/trusted_entities/ec2.json' %},
+        {% include 'roles/trusted_entities/oidc.json' %},
+        {% include 'roles/trusted_entities/eks.json' %}
+    ]
+}
