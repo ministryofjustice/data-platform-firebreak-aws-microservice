@@ -1,12 +1,12 @@
 {
-    "Effect": "Allow",
-    "Principal": {
-        "Federated": "{{ eks_arn }}"
-    },
-    "Action": "sts:AssumeRoleWithWebIdentity",
-    "Condition": {
-        "StringLike": {
-            "{{ oidc_eks_provider }}:sub": "system:serviceaccount:user-{{ username }}:{{ username }}-*"
-        }
+  "Effect": "Allow",
+  "Principal": {
+    "Federated": "{{ eks_arn }}"
+  },
+  "Action": "sts:AssumeRoleWithWebIdentity",
+  "Condition": {
+    "StringLike": {
+      "{{ oidc_eks_provider }}:sub": "system:serviceaccount:user-{{ username }}:{{ username }}-*"
     }
+  }
 }
