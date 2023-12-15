@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    aws_account_id: str
     oidc_domain: str
     oidc_eks_provider: str
 
