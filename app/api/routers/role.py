@@ -27,7 +27,7 @@ async def get_roles():
 
 
 @router.get("/{role_name}/")
-async def get_role_by_name(role_name: str) -> HTTPException | dict:
+async def get_role_by_name(role_name: str):
     """Return an IAM role for a given role name"""
     response = iam_client().get_role(RoleName=role_name)
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
@@ -36,7 +36,7 @@ async def get_role_by_name(role_name: str) -> HTTPException | dict:
 
 
 @router.get("/{role_name}/policies/")
-async def get_policies_by_role_name(role_name: str) -> HTTPException | list[dict]:
+async def get_inline_policies_by_role_name(role_name: str):
     """Return inline iam policies for a given iam role identified by role_name"""
     response = iam_client().list_role_policies(RoleName=role_name)
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
@@ -44,6 +44,7 @@ async def get_policies_by_role_name(role_name: str) -> HTTPException | list[dict
 
     policies: list[dict] = list()
     for policy_name in response.get("PolicyNames", []):
+        print(policy_name)
         policy_response: dict = iam_client().get_role_policy(
             RoleName=role_name, PolicyName=policy_name
         )
