@@ -22,9 +22,10 @@ def test_get_role_by_name(create_iam_role, iam_role_name) -> None:
     assert data["RoleName"] == iam_role_name
 
 
-def test_get_iam_policies_for_role(iam_role_name, attach_iam_role_policy):
+def test_get_managed_policies_for_role(iam_role_name, attach_iam_role_policy, iam_policy_name):
     response = client.get(f"/roles/{iam_role_name}/policies/")
     data = response.json()
 
-    assert len(data) > 0
+    assert len(data) == 1
     assert response.status_code == 200
+    assert data[0]["PolicyName"] == iam_policy_name

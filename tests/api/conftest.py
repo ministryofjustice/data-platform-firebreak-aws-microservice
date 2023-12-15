@@ -61,13 +61,11 @@ def iam_policy_document() -> str:
 
 @pytest.fixture
 def create_iam_role_policy(iam_client, iam_policy_name, iam_policy_document):
-    return iam_client.create_iam_role_policy(
-        PolicyName=iam_policy_name, PolicyDocument=iam_policy_document
-    )
+    return iam_client.create_policy(PolicyName=iam_policy_name, PolicyDocument=iam_policy_document)
 
 
 @pytest.fixture
 def attach_iam_role_policy(iam_client, create_iam_role, create_iam_role_policy, iam_role_name):
     response = create_iam_role_policy
     policy = response.get("Policy")
-    return iam_client.attach_iam_role_policy(RoleName=iam_role_name, PolicyArn=policy.get("Arn"))
+    return iam_client.attach_role_policy(RoleName=iam_role_name, PolicyArn=policy.get("Arn"))

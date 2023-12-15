@@ -1,4 +1,4 @@
-import json
+from typing import Any
 
 import boto3
 from fastapi import APIRouter, Depends, HTTPException
@@ -36,22 +36,19 @@ async def get_role_by_name(role_name: str):
 
 
 @router.get("/{role_name}/policies/")
-async def get_inline_policies_by_role_name(role_name: str):
+async def get_managed_policies_by_role_name(role_name: str):
     """Return inline iam policies for a given iam role identified by role_name"""
-    response = iam_client().list_role_policies(RoleName=role_name)
+    response = iam_client().list_attached_role_policies(RoleName=role_name)
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
         return HTTPException(status_code=400)
 
-    policies: list[dict] = list()
-    for policy_name in response.get("PolicyNames", []):
-        print(policy_name)
-        policy_response: dict = iam_client().get_role_policy(
-            RoleName=role_name, PolicyName=policy_name
-        )
+    policies: list[dict[Any, Any]] = list()
+    for policy in response.get("AttachedPolicies", []):
+        policy_arn: str = policy.get("PolicyArn")
+        policy_response: dict = iam_client().get_policy(PolicyArn=policy_arn)
         if not policy_response["ResponseMetadata"]["HTTPStatusCode"] == 200:
             return HTTPException(status_code=400)
-        policies.append(json.loads(policy_response.get("PolicyDocument", "")))
-
+        policies.append(policy_response.get("Policy", {}))
     return policies
 
 
