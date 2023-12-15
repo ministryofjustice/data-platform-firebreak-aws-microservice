@@ -4,9 +4,9 @@ import boto3
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app import aws
 from app.core import crud
 from app.core.databases import get_db
-from app.core.jinja import JsonTemplates
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
@@ -63,7 +63,6 @@ async def get_role(username: str, db: Session = Depends(get_db)):
 
 @router.post("/")
 async def create_role(username: str):
-    policy = JsonTemplates().get_trust_policy_data(username=username)
-    iam = iam_client()
-    response = iam.create_role(RoleName=username, AssumeRolePolicyDocument=json.dumps(policy))
+    aws_service = aws.AWSRoleService(username=username)
+    response = aws_service.create_role()
     return response["Role"]
