@@ -28,7 +28,7 @@ class BaseAWSService:
         return boto3.client(service)
 
 
-class AWSRoleService(BaseAWSService):
+class AWSRolesService(BaseAWSService):
     SERVICE = "iam"
 
     def __init__(self, username: str) -> None:

@@ -4,7 +4,7 @@ import boto3
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import aws
+from app import services
 from app.core import crud
 from app.core.databases import get_db
 
@@ -63,6 +63,6 @@ async def get_role(username: str, db: Session = Depends(get_db)):
 
 @router.post("/")
 async def create_role(username: str):
-    aws_service = aws.AWSRoleService(username=username)
+    aws_service = services.AWSRolesService(username=username)
     response = aws_service.create_role()
     return response["Role"]
