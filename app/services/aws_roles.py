@@ -31,9 +31,10 @@ class BaseAWSService:
 class AWSRolesService(BaseAWSService):
     SERVICE = "iam"
 
-    def __init__(self, username: str) -> None:
+    def __init__(self, username: str, oidc_user_id: str) -> None:
         super().__init__()
         self.username = username
+        self.oidc_user_id = oidc_user_id
 
     @property
     def client(self) -> boto3.client:
@@ -49,7 +50,7 @@ class AWSRolesService(BaseAWSService):
             "username": self.username,
             "oidc_arn": self.oidc_arn(settings.oidc_domain),
             "oidc_domain": settings.oidc_domain,
-            "user_oidc_id": self.username,  # noqa: TODO this should come from the OIDC provider, via /userinfo endpoint
+            "oidc_user_id": self.oidc_user_id,
             "eks_arn": self.oidc_arn(settings.oidc_eks_provider),
             "oidc_eks_provider": settings.oidc_eks_provider,
         }

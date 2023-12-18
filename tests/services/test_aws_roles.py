@@ -38,10 +38,11 @@ class TestBaseAWSService:
 
 class TestAWSRolesService:
     username = "exampleusername"
+    oidc_user_id = "user_1234"
 
     @pytest.fixture
     def service(self):
-        return AWSRolesService(username=self.username)
+        return AWSRolesService(username=self.username, oidc_user_id=self.oidc_user_id)
 
     @pytest.fixture
     def oidc_arn(self):
@@ -58,7 +59,7 @@ class TestAWSRolesService:
         jinja = JsonTemplates()
         template = jinja.get_template("roles/trusted_entities/oidc.json")
         context = {
-            "user_oidc_id": self.username,
+            "oidc_user_id": self.oidc_user_id,
             "oidc_domain": settings.oidc_domain,
             "oidc_arn": oidc_arn.format(domain=settings.oidc_domain),
         }

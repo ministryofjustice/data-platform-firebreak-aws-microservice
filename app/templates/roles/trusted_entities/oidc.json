@@ -6,7 +6,7 @@
   "Action": "sts:AssumeRoleWithWebIdentity",
   "Condition": {
     "StringEquals": {
-      "{{ oidc_domain }}/:sub": "{{ user_oidc_id }}"
+      "{{ oidc_domain }}/:sub": "{{ oidc_user_id }}"
     }
   }
 }

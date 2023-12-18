@@ -29,3 +29,18 @@ def test_get_managed_policies_for_role(iam_role_name, attach_iam_role_policy, ia
     assert len(data) == 1
     assert response.status_code == 200
     assert data[0]["PolicyName"] == iam_policy_name
+
+
+def test_create_role():
+    client = TestClient(app)
+
+    response = client.post(
+        "/roles/",
+        json={
+            "username": "example_user",
+            "oidc_user_id": "1234",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["RoleName"] == "example_user"
