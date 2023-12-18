@@ -4,6 +4,7 @@ import boto3
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app import services
 from app.core import crud, schemas
 from app.core.databases import get_db
 
@@ -61,8 +62,7 @@ async def get_role(username: str, db: Session = Depends(get_db)):
 
 
 @router.post("/")
-async def create_role(role: schemas.RoleCreate, db: Session = Depends(get_db)):
-    db_role = crud.get_role(db, role.username)
-    if db_role:
-        raise HTTPException(status_code=400, detail="Role exists")
-    return crud.create_role(db, role)
+async def create_role(role: schemas.RoleCreate):
+    aws_service = services.AWSRolesService(username=role.username, oidc_user_id=role.oidc_user_id)
+    response = aws_service.create_role()
+    return response["Role"]

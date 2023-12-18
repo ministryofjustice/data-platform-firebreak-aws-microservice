@@ -17,12 +17,11 @@ class Permission(PermissionBase):
 
 
 class RoleBase(BaseModel):
-    name: str
     username: str
 
 
 class RoleCreate(RoleBase):
-    pass
+    oidc_user_id: str
 
 
 class RoleRead(RoleBase):
