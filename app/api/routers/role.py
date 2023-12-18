@@ -52,12 +52,12 @@ async def get_managed_policies_by_role_name(role_name: str):
     policy_names = data["PolicyNames"]
 
     for policy_name in policy_names:
-        inline_policy = client.get_role_policy(
-            RoleName=role_name, PolicyName=policy_name.get("PolicyName")
-        )
+        inline_policy = client.get_role_policy(RoleName=role_name, PolicyName=policy_name)
         if not inline_policy["ResponseMetadata"]["HTTPStatusCode"] == 200:
             return HTTPException(status_code=400)
-        policies.append(inline_policy.get("PolicyDocument"))
+        policies.append(
+            {"PolicyName": policy_name, "PolicyDocument": inline_policy.get("PolicyDocument")}
+        )
 
     # Attached Policies
     response = client.list_attached_role_policies(RoleName=role_name)
