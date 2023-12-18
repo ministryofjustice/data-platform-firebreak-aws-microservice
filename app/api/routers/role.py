@@ -39,14 +39,34 @@ async def get_role_by_name(role_name: str):
 @router.get("/{role_name}/policies/")
 async def get_managed_policies_by_role_name(role_name: str):
     """Return inline iam policies for a given iam role identified by role_name"""
-    response = iam_client().list_attached_role_policies(RoleName=role_name)
+    client = iam_client()
+    policies: list[dict[Any, Any]] = list()
+
+    inline_policy_response = client.list_role_policies(
+        RoleName=role_name,
+    )
+    if not inline_policy_response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+        return HTTPException(status_code=400)
+
+    data = inline_policy_response
+    policy_names = data["PolicyNames"]
+
+    for policy_name in policy_names:
+        inline_policy = client.get_role_policy(
+            RoleName=role_name, PolicyName=policy_name.get("PolicyName")
+        )
+        if not inline_policy["ResponseMetadata"]["HTTPStatusCode"] == 200:
+            return HTTPException(status_code=400)
+        policies.append(inline_policy.get("PolicyDocument"))
+
+    # Attached Policies
+    response = client.list_attached_role_policies(RoleName=role_name)
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
         return HTTPException(status_code=400)
 
-    policies: list[dict[Any, Any]] = list()
     for policy in response.get("AttachedPolicies", []):
         policy_arn: str = policy.get("PolicyArn")
-        policy_response: dict = iam_client().get_policy(PolicyArn=policy_arn)
+        policy_response: dict = client.get_policy(PolicyArn=policy_arn)
         if not policy_response["ResponseMetadata"]["HTTPStatusCode"] == 200:
             return HTTPException(status_code=400)
         policies.append(policy_response.get("Policy", {}))
