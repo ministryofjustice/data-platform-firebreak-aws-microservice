@@ -1,10 +1,14 @@
 import boto3
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Security
 
 from app import services
+from app.api.auth import VerifyToken
 from app.core import schemas
 
 router = APIRouter(prefix="/roles", tags=["roles"])
+
+
+auth = VerifyToken()
 
 
 def iam_client() -> boto3.client:
@@ -12,7 +16,7 @@ def iam_client() -> boto3.client:
     return boto3.client("iam")
 
 
-@router.get("/")
+@router.get("/", dependencies=[Security(dependency=auth.verify, scopes=["read:roles"])])
 async def get_roles():
     """
     List all the roles

@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.security import HTTPBearer
 
 from app.api.routers import role
@@ -14,7 +14,7 @@ models.Base.metadata.create_all(bind=databases.engine)
 token_auth_scheme = HTTPBearer()
 
 # initialise the app with routes
-app = FastAPI(dependencies=[Depends(token_auth_scheme)])
+app = FastAPI()
 app.include_router(role.router)
 
 
