@@ -70,14 +70,14 @@ class TestAWSRolesService:
         jinja = JsonTemplates()
         template = jinja.get_template("roles/trusted_entities/eks.json")
         context = {
-            "username": self.username,
+            "username": self.rolename,
             "eks_arn": oidc_arn.format(domain=settings.oidc_eks_provider),
             "oidc_eks_provider": settings.oidc_eks_provider,
         }
         return json.loads(template.render(**context))
 
     def test_init(self, service):
-        assert service.username == self.rolename
+        assert service.rolename == self.rolename
         assert service.SERVICE == "iam"
 
     @pytest.mark.parametrize(
@@ -110,7 +110,7 @@ class TestAWSRolesService:
                 eks_statement,
             ],
         }
-        response = service.create_role()
+        response = service.create_role(oidc_user_id=self.oidc_user_id)
 
         assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
         assert response["Role"]["RoleName"] == self.rolename

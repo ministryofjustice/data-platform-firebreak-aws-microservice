@@ -58,8 +58,8 @@ class AWSRolesService(BaseAWSService):
         rendered = template.render(**context)
         return json.loads(rendered)
 
-    def create_role(self):
-        trust_policy = self.get_trust_policy_data()
+    def create_role(self, oidc_user_id):
+        trust_policy = self.get_trust_policy_data(oidc_user_id=oidc_user_id)
         return self.client.create_role(
             RoleName=self.rolename, AssumeRolePolicyDocument=json.dumps(trust_policy)
         )

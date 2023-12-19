@@ -1,7 +1,8 @@
 import boto3
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 
 from app import services
+from app.core import schemas
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
@@ -18,7 +19,7 @@ async def get_roles():
     """
     response = iam_client().list_roles()
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-        return HTTPException(400)
+        return HTTPException(status_code=400)
     return response.get("Roles", [])
 
 
@@ -31,9 +32,16 @@ async def get_role_by_name(role_name: str):
     return response.get("Role", {})
 
 
+@router.post("/")
+async def create_role(role: schemas.RoleCreate) -> Response:
+    aws_service = services.AWSRolesService(rolename=role.rolename)
+    response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
+    return response["Role"]
+
+
 @router.get("/{role_name}/policies/")
-async def get_policies_by_role_name(role_name: str):
+async def get_policies_by_role_name(role_name: str) -> Response:
     """Return inline iam policies for a given iam role identified by role_name"""
     service = services.AWSRolesService(rolename=role_name)
-    policies = service.get_policies_for_role()
+    policies: list[dict] = service.get_policies_for_role()
     return policies

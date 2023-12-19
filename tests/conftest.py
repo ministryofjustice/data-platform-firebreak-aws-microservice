@@ -69,3 +69,12 @@ def attach_iam_role_policy(iam_client, create_iam_role, create_iam_role_policy, 
     response = create_iam_role_policy
     policy = response.get("Policy")
     return iam_client.attach_role_policy(RoleName=iam_role_name, PolicyArn=policy.get("Arn"))
+
+
+@pytest.fixture
+def attach_inline_policy(iam_client, iam_role_name, iam_policy_name, iam_policy_document):
+    return iam_client.put_role_policy(
+        PolicyDocument=iam_policy_document,
+        PolicyName="inline-policy",
+        RoleName=iam_role_name,
+    )
