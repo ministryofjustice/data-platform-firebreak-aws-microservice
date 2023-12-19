@@ -8,6 +8,7 @@ from app.core import schemas
 router = APIRouter(prefix="/roles", tags=["roles"])
 
 
+# refactor this to use a function? Or pass to paths directly?
 auth = VerifyToken()
 
 
@@ -16,7 +17,7 @@ def iam_client() -> boto3.client:
     return boto3.client("iam")
 
 
-@router.get("/", dependencies=[Security(dependency=auth.verify, scopes=["read:roles"])])
+@router.get("/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
 async def get_roles():
     """
     List all the roles

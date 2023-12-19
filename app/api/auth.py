@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Annotated
 
 import jwt
 from fastapi import Depends
@@ -22,10 +22,10 @@ class VerifyToken:
         self.jwks_url = f"https://{settings.oidc_domain}/.well-known/jwks.json"
         self.jwks_client = jwt.PyJWKClient(self.jwks_url)
 
-    async def verify(
+    async def __call__(
         self,
         security_scopes: SecurityScopes,
-        token: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer()),
+        token: Annotated[HTTPAuthorizationCredentials, Depends(token_auth_scheme)],
     ):
         if token is None:
             raise exceptions.UnauthenticatedException
