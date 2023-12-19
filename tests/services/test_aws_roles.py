@@ -37,12 +37,12 @@ class TestBaseAWSService:
 
 
 class TestAWSRolesService:
-    username = "exampleusername"
+    rolename = "exampleusername"
     oidc_user_id = "user_1234"
 
     @pytest.fixture
     def service(self):
-        return AWSRolesService(username=self.username, oidc_user_id=self.oidc_user_id)
+        return AWSRolesService(rolename=self.rolename)
 
     @pytest.fixture
     def oidc_arn(self):
@@ -77,7 +77,7 @@ class TestAWSRolesService:
         return json.loads(template.render(**context))
 
     def test_init(self, service):
-        assert service.username == self.username
+        assert service.username == self.rolename
         assert service.SERVICE == "iam"
 
     @pytest.mark.parametrize(
@@ -94,9 +94,10 @@ class TestAWSRolesService:
         assert service.oidc_arn(domain=domain) == expected
 
     def test_get_trust_policy_data(self, service, oidc_statement, eks_statement, ec2_statement):
-        result = service.get_trust_policy_data()
+        result = service.get_trust_policy_data(oidc_user_id=self.oidc_user_id)
         assert oidc_statement in result["Statement"]
         assert eks_statement in result["Statement"]
+
         assert ec2_statement in result["Statement"]
         assert result["Version"] == "2012-10-17"
 
@@ -112,5 +113,5 @@ class TestAWSRolesService:
         response = service.create_role()
 
         assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
-        assert response["Role"]["RoleName"] == self.username
+        assert response["Role"]["RoleName"] == self.rolename
         assert response["Role"]["AssumeRolePolicyDocument"] == trust_policy
