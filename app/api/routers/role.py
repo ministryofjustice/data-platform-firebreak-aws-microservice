@@ -28,7 +28,7 @@ async def get_roles():
     return response.get("Roles", [])
 
 
-@router.get("/{role_name}/")
+@router.get("/{role_name}/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
 async def get_role_by_name(role_name: str):
     """Return an IAM role for a given role name"""
     response = iam_client().get_role(RoleName=role_name)
