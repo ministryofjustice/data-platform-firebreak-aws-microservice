@@ -27,11 +27,11 @@ def test_get_policies_for_role(
 ):
     response = client.get(f"/roles/{iam_role_name}/policies/")
     data = response.json()
-    print(data)
 
     assert len(data) == 2
     assert response.status_code == 200
     assert data[0]["PolicyName"] == "inline-policy"
+    assert data[1]["PolicyName"] == iam_policy_name
 
 
 def test_create_role():

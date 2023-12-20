@@ -37,11 +37,17 @@ class TestBaseAWSService:
 
 
 class TestAWSRolesService:
-    rolename = "exampleusername"
-    oidc_user_id = "user_1234"
+    # rolename = "exampleusername"
+    rolename = None
+    oidc_user_id = None
+
+    @pytest.fixture(autouse=True)
+    def setup(self, iam_role_name, oidc_user_identity):
+        self.rolename = iam_role_name
+        self.oidc_user_id = oidc_user_identity
 
     @pytest.fixture
-    def service(self):
+    def service(self, iam_role_name):
         return AWSRolesService(rolename=self.rolename)
 
     @pytest.fixture
@@ -115,3 +121,15 @@ class TestAWSRolesService:
         assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
         assert response["Role"]["RoleName"] == self.rolename
         assert response["Role"]["AssumeRolePolicyDocument"] == trust_policy
+
+    def test_get_policies_for_role(
+        self,
+        service: AWSRolesService,
+        iam_policy_name,
+        attach_iam_role_policy,
+        attach_inline_policy,
+    ) -> None:
+        policies: list[dict] = service.get_policies_for_role()
+        assert len(policies) == 2
+        assert policies[0]["PolicyName"] == "inline-policy"
+        assert policies[1]["PolicyName"] == iam_policy_name
