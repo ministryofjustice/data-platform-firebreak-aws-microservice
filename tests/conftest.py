@@ -13,6 +13,11 @@ def iam_client():
 
 
 @pytest.fixture
+def oidc_user_identity():
+    return "user_1234"
+
+
+@pytest.fixture
 def iam_role_name():
     return "example-iam-role"
 
