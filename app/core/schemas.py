@@ -17,7 +17,7 @@ class Permission(PermissionBase):
 
 
 class RoleBase(BaseModel):
-    username: str
+    rolename: str
 
 
 class RoleCreate(RoleBase):

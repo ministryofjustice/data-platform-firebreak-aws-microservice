@@ -37,12 +37,18 @@ class TestBaseAWSService:
 
 
 class TestAWSRolesService:
-    username = "exampleusername"
-    oidc_user_id = "user_1234"
+    # rolename = "exampleusername"
+    rolename = None
+    oidc_user_id = None
+
+    @pytest.fixture(autouse=True)
+    def setup(self, iam_role_name, oidc_user_identity):
+        self.rolename = iam_role_name
+        self.oidc_user_id = oidc_user_identity
 
     @pytest.fixture
-    def service(self):
-        return AWSRolesService(username=self.username, oidc_user_id=self.oidc_user_id)
+    def service(self, iam_role_name):
+        return AWSRolesService(rolename=self.rolename)
 
     @pytest.fixture
     def oidc_arn(self):
@@ -70,14 +76,14 @@ class TestAWSRolesService:
         jinja = JsonTemplates()
         template = jinja.get_template("roles/trusted_entities/eks.json")
         context = {
-            "username": self.username,
+            "username": self.rolename,
             "eks_arn": oidc_arn.format(domain=settings.oidc_eks_provider),
             "oidc_eks_provider": settings.oidc_eks_provider,
         }
         return json.loads(template.render(**context))
 
     def test_init(self, service):
-        assert service.username == self.username
+        assert service.rolename == self.rolename
         assert service.SERVICE == "iam"
 
     @pytest.mark.parametrize(
@@ -94,9 +100,10 @@ class TestAWSRolesService:
         assert service.oidc_arn(domain=domain) == expected
 
     def test_get_trust_policy_data(self, service, oidc_statement, eks_statement, ec2_statement):
-        result = service.get_trust_policy_data()
+        result = service.get_trust_policy_data(oidc_user_id=self.oidc_user_id)
         assert oidc_statement in result["Statement"]
         assert eks_statement in result["Statement"]
+
         assert ec2_statement in result["Statement"]
         assert result["Version"] == "2012-10-17"
 
@@ -109,8 +116,21 @@ class TestAWSRolesService:
                 eks_statement,
             ],
         }
-        response = service.create_role()
+        response = service.create_role(oidc_user_id=self.oidc_user_id)
 
         assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
-        assert response["Role"]["RoleName"] == self.username
+        assert response["Role"]["RoleName"] == self.rolename
         assert response["Role"]["AssumeRolePolicyDocument"] == trust_policy
+
+    def test_get_policies_for_role(
+        self,
+        service: AWSRolesService,
+        iam_policy_name,
+        attach_iam_role_policy,
+        attach_inline_policy,
+    ) -> None:
+        policies: list[dict] = service.get_policies_for_role()
+        print(policies)
+        assert len(policies) == 2
+        assert policies[0]["PolicyName"] == "inline-policy"
+        assert policies[1]["PolicyName"] == iam_policy_name

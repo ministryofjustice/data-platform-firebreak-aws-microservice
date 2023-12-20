@@ -1,12 +1,8 @@
-from typing import Any
-
 import boto3
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, Response
 
 from app import services
-from app.core import crud, schemas
-from app.core.databases import get_db
+from app.core import schemas
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
@@ -23,7 +19,7 @@ async def get_roles():
     """
     response = iam_client().list_roles()
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-        return HTTPException(400)
+        return HTTPException(status_code=400)
     return response.get("Roles", [])
 
 
@@ -36,33 +32,16 @@ async def get_role_by_name(role_name: str):
     return response.get("Role", {})
 
 
-@router.get("/{role_name}/policies/")
-async def get_managed_policies_by_role_name(role_name: str):
-    """Return inline iam policies for a given iam role identified by role_name"""
-    response = iam_client().list_attached_role_policies(RoleName=role_name)
-    if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-        return HTTPException(status_code=400)
-
-    policies: list[dict[Any, Any]] = list()
-    for policy in response.get("AttachedPolicies", []):
-        policy_arn: str = policy.get("PolicyArn")
-        policy_response: dict = iam_client().get_policy(PolicyArn=policy_arn)
-        if not policy_response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-            return HTTPException(status_code=400)
-        policies.append(policy_response.get("Policy", {}))
-    return policies
-
-
-@router.get("/{username}/")
-async def get_role(username: str, db: Session = Depends(get_db)):
-    db_role = crud.get_role(db, username)
-    if not db_role:
-        raise HTTPException(status_code=404, detail="Role Does Not Exist")
-    return db_role
-
-
 @router.post("/")
-async def create_role(role: schemas.RoleCreate):
-    aws_service = services.AWSRolesService(username=role.username, oidc_user_id=role.oidc_user_id)
-    response = aws_service.create_role()
+async def create_role(role: schemas.RoleCreate) -> Response:
+    aws_service = services.AWSRolesService(rolename=role.rolename)
+    response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
     return response["Role"]
+
+
+@router.get("/{role_name}/policies/")
+async def get_policies_by_role_name(role_name: str) -> Response:
+    """Return inline iam policies for a given iam role identified by role_name"""
+    service = services.AWSRolesService(rolename=role_name)
+    policies: list[dict] = service.get_policies_for_role()
+    return policies
