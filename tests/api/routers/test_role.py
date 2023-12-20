@@ -54,3 +54,21 @@ def test_create_role(client):
 
     assert response.status_code == 200
     assert response.json()["RoleName"] == "example_user"
+
+
+@pytest.mark.parametrize(
+    "path, method",
+    [
+        ("/roles/", "get"),
+        ("/roles/example-role/", "get"),
+        ("/roles/example-role/policies", "get"),
+        ("/roles/", "post"),
+    ],
+)
+def test_unathorised_without_auth_header(path, method):
+    """
+    Check for all urls that without auth header, an unauthorised response is raised
+    """
+    client = TestClient(app=app)
+    response = client.request(method=method, url=path)
+    assert response.status_code == 403
