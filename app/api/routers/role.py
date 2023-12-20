@@ -1,10 +1,15 @@
 import boto3
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Security
 
 from app import services
+from app.api.auth import VerifyToken
 from app.core import schemas
 
 router = APIRouter(prefix="/roles", tags=["roles"])
+
+
+# refactor this to use a function? Or pass to paths directly?
+auth = VerifyToken()
 
 
 def iam_client() -> boto3.client:
@@ -12,7 +17,7 @@ def iam_client() -> boto3.client:
     return boto3.client("iam")
 
 
-@router.get("/")
+@router.get("/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
 async def get_roles():
     """
     List all the roles
@@ -23,7 +28,7 @@ async def get_roles():
     return response.get("Roles", [])
 
 
-@router.get("/{role_name}/")
+@router.get("/{role_name}/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
 async def get_role_by_name(role_name: str):
     """Return an IAM role for a given role name"""
     response = iam_client().get_role(RoleName=role_name)
@@ -32,14 +37,16 @@ async def get_role_by_name(role_name: str):
     return response.get("Role", {})
 
 
-@router.post("/")
+@router.post("/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
 async def create_role(role: schemas.RoleCreate) -> Response:
     aws_service = services.AWSRolesService(rolename=role.rolename)
     response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
     return response["Role"]
 
 
-@router.get("/{role_name}/policies/")
+@router.get(
+    "/{role_name}/policies/", dependencies=[Security(dependency=auth, scopes=["read:roles"])]
+)
 async def get_policies_by_role_name(role_name: str) -> Response:
     """Return inline iam policies for a given iam role identified by role_name"""
     service = services.AWSRolesService(rolename=role_name)
