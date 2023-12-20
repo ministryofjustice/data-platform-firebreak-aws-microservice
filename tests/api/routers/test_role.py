@@ -32,7 +32,7 @@ def test_get_role_by_name(create_iam_role, iam_role_name, client) -> None:
 
 
 def test_get_policies_for_role(
-    iam_role_name, attach_iam_role_policy, attach_inline_policy, iam_policy_name
+    iam_role_name, attach_iam_role_policy, attach_inline_policy, iam_policy_name, client
 ):
     response = client.get(f"/roles/{iam_role_name}/policies/")
     data = response.json()

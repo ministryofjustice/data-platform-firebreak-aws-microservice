@@ -37,14 +37,16 @@ async def get_role_by_name(role_name: str):
     return response.get("Role", {})
 
 
-@router.post("/")
+@router.post("/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
 async def create_role(role: schemas.RoleCreate) -> Response:
     aws_service = services.AWSRolesService(rolename=role.rolename)
     response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
     return response["Role"]
 
 
-@router.get("/{role_name}/policies/")
+@router.get(
+    "/{role_name}/policies/", dependencies=[Security(dependency=auth, scopes=["read:roles"])]
+)
 async def get_policies_by_role_name(role_name: str) -> Response:
     """Return inline iam policies for a given iam role identified by role_name"""
     service = services.AWSRolesService(rolename=role_name)
