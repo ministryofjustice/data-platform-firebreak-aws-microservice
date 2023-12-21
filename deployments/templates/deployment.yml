@@ -23,5 +23,30 @@ spec:
             - name: AWS_ACCOUNT_ID
               valueFrom:
                 secretKeyRef:
-                  name: aws-account-id
+                  name: aws-microservice-secrets
                   key: aws_account_id
+            - name: OIDC_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: aws-microservice-secrets
+                  key: oidc_domain
+            - name: OIDC_API_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: aws-microservice-secrets
+                  key: oidc_api_audience
+            - name: OIDC_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: aws-microservice-secrets
+                  key: oidc_issuer
+            - name: OIDC_ALGORITHMS
+              valueFrom:
+                secretKeyRef:
+                  name: aws-microservice-secrets
+                  key: oidc_algorithms
+            - name: OIDC_EKS_PROVIDER
+              valueFrom:
+                secretKeyRef:
+                  name: aws-microservice-secrets
+                  key: oidc_eks_provider

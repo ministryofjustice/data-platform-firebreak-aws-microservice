@@ -30,13 +30,20 @@ jobs:
           cat deployments/templates/ingress.yml | envsubst > deployments/ingress.yml
           cat deployments/templates/service.yml | envsubst > deployments/service.yml
           cat deployments/templates/serviceaccount.yml | envsubst > deployments/serviceaccount.yml
+          cat deployments/templates/secrets.yml | envsubst > deployments/secrets.yml
         env:
           IMAGE_TAG: ${{ github.sha }}
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ vars.ECR_REPOSITORY }}
           NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_SERVICE_ROLE_ARN: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_SERVICE_ROLE_ARN: ${{ secrets.AWS_SERVICE_ROLE_ARN }}
+          OIDC_DOMAIN: ${{ secrets.OIDC_DOMAIN }}
+          OIDC_API_AUDIENCE: ${{ secrets.OIDC_API_AUDIENCE }}
+          OIDC_ISSUER: ${{ secrets.OIDC_ISSUER }}
+          OIDC_ALGORITHMS: ${{ secrets.OIDC_ALGORITHMS }}
+          OIDC_EKS_PROVIDER: ${{ secrets.OIDC_EKS_PROVIDER }}
+
       - run: |
           echo "${{ secrets.KUBE_CERT }}" > ca.crt
           kubectl config set-cluster ${KUBE_CLUSTER} --certificate-authority=./ca.crt --server=https://${KUBE_CLUSTER}
