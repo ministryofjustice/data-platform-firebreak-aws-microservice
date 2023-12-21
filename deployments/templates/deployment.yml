@@ -14,6 +14,7 @@ spec:
       labels:
         app: dpat-aws-microservice # this should match the selector in service.yml
     spec:
+      serviceAccountName: dpat-aws-microservice-sa
       containers:
         - name: api
           image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
