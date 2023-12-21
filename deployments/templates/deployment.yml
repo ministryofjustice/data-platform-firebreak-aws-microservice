@@ -19,3 +19,9 @@ spec:
           image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
           ports:
             - containerPort: 8080
+          env:
+            - name: AWS_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-account-id
+                  key: aws_account_id
