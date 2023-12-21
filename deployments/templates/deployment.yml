@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpat-aws-microservice-deployment
+  labels:
+    app: dpat-aws-microservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dpat-aws-microservice # this should match the selector in service.yml
+  template:
+    metadata:
+      labels:
+        app: dpat-aws-microservice # this should match the selector in service.yml
+    spec:
+      containers:
+        - name: api
+          image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AWS_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-account-id
+                  key: aws_account_id
