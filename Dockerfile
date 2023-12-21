@@ -16,7 +16,7 @@ COPY ./app /code/app
 # Use a non-root user
 RUN addgroup --gid 31337 --system appuser \
   && adduser --uid 31337 --system appuser --ingroup appuser
-RUN chown --recursive appuser:appuser /app
+RUN chown --recursive appuser:appuser /code
 USER 31337
 
 #
