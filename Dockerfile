@@ -19,5 +19,5 @@ RUN addgroup --gid 31337 --system appuser \
 RUN chown --recursive appuser:appuser /code
 USER 31337
 
-#
+EXPOSE 80
 CMD ["uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "80"]
