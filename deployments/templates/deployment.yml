@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: example-deployment
+  name: dpat-aws-microservice-deployment
   labels:
-    app: example
+    app: dpat-aws-microservice
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: example # this should match the selector in service.yml
+      app: dpat-aws-microservice # this should match the selector in service.yml
   template:
     metadata:
       labels:
-        app: example # this should match the selector in service.yml
+        app: dpat-aws-microservice # this should match the selector in service.yml
     spec:
       containers:
-        - name: example
+        - name: api
           image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
           ports:
             - containerPort: 8080
