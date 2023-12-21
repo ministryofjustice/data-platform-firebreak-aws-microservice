@@ -37,7 +37,7 @@ async def get_role_by_name(role_name: str):
     return response.get("Role", {})
 
 
-@router.post("/", dependencies=[Security(dependency=auth, scopes=["read:roles"])])
+@router.post("/", dependencies=[Security(dependency=auth, scopes=["create:roles"])])
 async def create_role(role: schemas.RoleCreate) -> Response:
     aws_service = services.AWSRolesService(rolename=role.rolename)
     response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
