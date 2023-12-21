@@ -35,8 +35,3 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
-    hooks:
-      - id: yamllint
