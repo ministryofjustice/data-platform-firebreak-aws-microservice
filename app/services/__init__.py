@@ -1,1 +1,1 @@
-from .aws_roles import AWSRolesService  # noqa
+from .aws_roles import AWSRolesService, RoleDoesNotExistException, RoleExistsException  # noqa
