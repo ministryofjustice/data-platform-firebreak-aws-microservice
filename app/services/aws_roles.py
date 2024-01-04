@@ -2,12 +2,21 @@ import json
 from typing import Any
 
 import boto3
+import botocore
 from fastapi import HTTPException
 
 from app.core.config import get_settings
 from app.core.jinja import JsonTemplates
 
 settings = get_settings()
+
+
+class RoleExistsException(Exception):
+    pass
+
+
+class RoleDoesNotExistException(Exception):
+    pass
 
 
 class BaseAWSService:
@@ -60,9 +69,14 @@ class AWSRolesService(BaseAWSService):
 
     def create_role(self, oidc_user_id):
         trust_policy = self.get_trust_policy_data(oidc_user_id=oidc_user_id)
-        return self.client.create_role(
-            RoleName=self.rolename, AssumeRolePolicyDocument=json.dumps(trust_policy)
-        )
+        try:
+            return self.client.create_role(
+                RoleName=self.rolename, AssumeRolePolicyDocument=json.dumps(trust_policy)
+            )
+        except botocore.exceptions.ClientError as error:
+            if error.response["Error"]["Code"] == "EntityAlreadyExists":
+                raise RoleExistsException()
+            raise error
 
     def get_policies_for_role(self) -> list[dict]:
         policies: list[dict[str, Any]] = list()
@@ -73,9 +87,14 @@ class AWSRolesService(BaseAWSService):
     def _get_inline_policies_for_role(self) -> list[dict]:
         policies: list[dict[str, Any]] = list()
 
-        inline_policy_response = self.client.list_role_policies(
-            RoleName=self.rolename,
-        )
+        try:
+            inline_policy_response = self.client.list_role_policies(
+                RoleName=self.rolename,
+            )
+        except botocore.exceptions.ClientError as error:
+            if error.response["Error"]["Code"] == "NoSuchEntity":
+                raise RoleDoesNotExistException()
+            raise error
         if not inline_policy_response["ResponseMetadata"]["HTTPStatusCode"] == 200:
             return HTTPException(status_code=400)
 

@@ -1,5 +1,5 @@
 import boto3
-from fastapi import APIRouter, HTTPException, Response, Security
+from fastapi import APIRouter, HTTPException, Response, Security, status
 
 from app import services
 from app.api.auth import VerifyToken
@@ -33,14 +33,21 @@ async def get_role_by_name(role_name: str):
     """Return an IAM role for a given role name"""
     response = iam_client().get_role(RoleName=role_name)
     if not response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-        return HTTPException(status_code=400)
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Role {role_name} not found"
+        )
     return response.get("Role", {})
 
 
 @router.post("/", dependencies=[Security(dependency=auth, scopes=["create:roles"])])
 async def create_role(role: schemas.RoleCreate) -> Response:
     aws_service = services.AWSRolesService(rolename=role.rolename)
-    response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
+    try:
+        response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
+    except services.RoleExistsException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Role {role.rolename} already exists"
+        )
     return response["Role"]
 
 
@@ -50,5 +57,10 @@ async def create_role(role: schemas.RoleCreate) -> Response:
 async def get_policies_by_role_name(role_name: str) -> Response:
     """Return inline iam policies for a given iam role identified by role_name"""
     service = services.AWSRolesService(rolename=role_name)
-    policies: list[dict] = service.get_policies_for_role()
+    try:
+        policies: list[dict] = service.get_policies_for_role()
+    except services.RoleDoesNotExistException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Role {role_name} does not exist"
+        )
     return policies
