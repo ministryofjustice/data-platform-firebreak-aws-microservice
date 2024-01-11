@@ -38,6 +38,7 @@ class VerifyToken:
         except jwt.exceptions.DecodeError as error:
             raise exceptions.UnauthorizedException(str(error))
 
+        # verify the token
         try:
             payload = jwt.decode(
                 token.credentials,
@@ -49,6 +50,7 @@ class VerifyToken:
         except Exception as error:
             raise exceptions.UnauthorizedException(str(error))
 
+        # check required scope is included in the token
         token_data = TokenData(scopes=payload.get("scope"))
         for scope in security_scopes.scopes:
             if scope not in token_data.scopes:

@@ -8,12 +8,10 @@ from app.core import schemas
 router = APIRouter(prefix="/roles", tags=["roles"])
 
 
-# refactor this to use a function? Or pass to paths directly?
 auth = VerifyToken()
 
 
 def iam_client() -> boto3.client:
-    # TODO mock this in local dev? Try localstack?
     return boto3.client("iam")
 
 
@@ -41,6 +39,7 @@ async def get_role_by_name(role_name: str):
 
 @router.post("/", dependencies=[Security(dependency=auth, scopes=["create:roles"])])
 async def create_role(role: schemas.RoleCreate) -> Response:
+    """Create an IAM role for a given role name"""
     aws_service = services.AWSRolesService(rolename=role.rolename)
     try:
         response = aws_service.create_role(oidc_user_id=role.oidc_user_id)
